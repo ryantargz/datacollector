@@ -197,6 +197,15 @@ public class ElasticsearchStageDelegate {
     return restClient.performRequest(method, endpoint, params, entity, headers);
   }
 
+  public Response performRequest(
+          String method,
+          String endpoint,
+          Map<String, String> params,
+          Header... headers
+  ) throws IOException {
+    return restClient.performRequest(method, endpoint, params, headers);
+  }
+
   private void addSniffer(HttpHost[] hosts) {
     if (conf.clientSniff) {
       switch (hosts[0].getSchemeName()) {

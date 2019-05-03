@@ -360,16 +360,15 @@ public class ElasticsearchSource extends BasePushSource {
     }
 
     private JsonObject getResults(String scrollId) throws StageException {
-      HttpEntity entity = new StringEntity(
-          String.format("{\"scroll\":\"%s\",\"scroll_id\":\"%s\"}", conf.cursorTimeout, scrollId),
-          ContentType.APPLICATION_JSON
-      );
+
+      final Map<String, String> requestParams = new HashMap<>(conf.params);
+      requestParams.put("scroll", conf.cursorTimeout);
+      requestParams.put("scroll_id", scrollId);
 
       try {
         Response response = delegate.performRequest("POST",
             "/_search/scroll",
-            conf.params,
-            entity,
+            requestParams,
             delegate.getAuthenticationHeader(conf.securityConfig.securityUser.get())
         );
 
@@ -386,15 +385,14 @@ public class ElasticsearchSource extends BasePushSource {
         return;
       }
 
-      HttpEntity entity = new StringEntity(
-          String.format("{\"scroll_id\":[\"%s\"]}", scrollId),
-          ContentType.APPLICATION_JSON
-      );
+      final Map<String, String> requestParams = new HashMap<>(conf.params);
+      requestParams.put("scroll_id", scrollId);
+
+      HttpEntity entity = new StringEntity(scrollId,ContentType.APPLICATION_JSON);
       delegate.performRequest(
         "DELETE",
         "/_search/scroll",
-        conf.params,
-        entity,
+        requestParams,
         delegate.getAuthenticationHeader(conf.securityConfig.securityUser.get())
       );
     }
